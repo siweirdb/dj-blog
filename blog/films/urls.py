@@ -1,9 +1,9 @@
-from rest_framework.routers import DefaultRouter
 
+from django.urls import include, path
 from . import views
 
 
-router = DefaultRouter()
-router.register('films', views.FilmView, basename='products')
-
-urlpatterns = router.urls
+urlpatterns = [
+    path('api/films', views.film_list),
+    path('api/films/<int:pk>', views.film_detail),
+]
