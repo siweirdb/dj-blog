@@ -1,27 +1,17 @@
 import time
 from django.shortcuts import render
 from rest_framework.response import Response
-from . import models
-from .serializers import FilmSerializer
-from django.http.response import JsonResponse
+
 from rest_framework.parsers import JSONParser
 from rest_framework import status
 
 from rest_framework.decorators import api_view
-from django.db.models import Count, F
-from rest_framework.decorators import action
-from rest_framework.viewsets import ModelViewSet, ViewSet
+
 
 from . import models, serializers
 from .serializers import FilmSerializer
 
 
-# class FilmView(ViewSet):
-#     def list(self, request):
-#         queryset = models.Film.objects.all()
-#         serializer = serializers.FilmSerializer(queryset, many=True)
-#
-#         return Response(serializer.data)
 @api_view(['GET', 'PUT', 'DELETE'])
 def film_detail(request, pk):
     try:
