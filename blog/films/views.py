@@ -1,52 +1,54 @@
 import time
+
+from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render
+from django.views.generic import ListView
 from rest_framework.response import Response
 
 from rest_framework.parsers import JSONParser
 from rest_framework import status
 
 from rest_framework.decorators import api_view
+from twisted.web._template_util import Redirect
 
-
-from . import models, serializers
+from . import models, forms
 from .serializers import FilmSerializer
 
 
-@api_view(['GET', 'PUT', 'DELETE'])
-def film_detail(request, pk):
-    try:
-        film = models.Film.objects.get(pk=pk)
-    except models.Film.DoesNotExist:
-        return Response({'message': 'The tutorial does not exist'}, status=status.HTTP_404_NOT_FOUND)
+class FilmDetailView(ListView):
+    template_name = 'film_detail.html'
+    model = models.Film
 
-    if request.method == 'GET':
-        tutorial_serializer = FilmSerializer(film)
-        return Response(tutorial_serializer.data)
+    def get_queryset(self):
+        queryset = super(FilmDetailView, self).get_queryset()
 
-    elif request.method == 'PUT':
-        tutorial_data = JSONParser().parse(request)
-        tutorial_serializer = FilmSerializer(film, data=tutorial_data)
-        if tutorial_serializer.is_valid():
-            tutorial_serializer.save()
-            return Response(tutorial_serializer.data)
-        return Response(tutorial_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    elif request.method == 'DELETE':
-        film.delete()
-        return Response({'message': 'Tutorial was deleted successfully!'}, status=status.HTTP_204_NO_CONTENT)
+        queryset = queryset.filter(id=self.kwargs.get('pk'))
+        print(queryset.values())
+        return queryset
 
 
-@api_view(['GET', 'POST'])
-def film_list(request):
-    films = models.Film.objects.all()
+@api_view(['DELETE'])
+def Deletee(request, pk):
+    film = models.Film.objects.get(id=pk)
+    return render(request,'success.html' )
 
-    if request.method == 'GET':
-        film_serializer = serializers.FilmSerializer(films, many=True)
-        return Response(film_serializer.data)
 
-    if request.method == 'POST':
-        serializer = FilmSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data,status=201)
-    return Response(status=400)
+class FilmListView(ListView):
+    model = models.Film
+    template_name = 'films.html'
+    queryset = models.Film.objects.all()
+
+    def post(self, request, *args, **kwargs):
+        form = forms.FilmsForm(request.POST)
+        if form.is_valid():
+            serializer = FilmSerializer(data=form.data)
+            if serializer.is_valid():
+                serializer.save()
+            return HttpResponse('<h1>new Film</h1>')
+        else:
+            return self.render_to_response(self.get_context_data(form=form))
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['form'] = forms.FilmsForm()
+        return context

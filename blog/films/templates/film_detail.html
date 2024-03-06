@@ -1,0 +1,20 @@
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+{% for film in object_list %}
+<p>{{film.title}}</p>
+<p>{{film.description}}</p>
+<p>{{film.duration}}</p>
+<p>{{film.year}}</p>
+<a style="color:red;font-size:25px;" href="{% url 'deletee' film.id %}">Delete</a>
+{% endfor%}
+
+
+
+</body>
+</html>
