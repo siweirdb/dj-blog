@@ -23,14 +23,14 @@ class FilmDetailView(ListView):
         queryset = super(FilmDetailView, self).get_queryset()
 
         queryset = queryset.filter(id=self.kwargs.get('pk'))
-        print(queryset.values())
         return queryset
 
 
-@api_view(['DELETE'])
-def Deletee(request, pk):
+def Delete(request, pk):
+    print("I am delete method")
     film = models.Film.objects.get(id=pk)
-    return render(request,'success.html' )
+    film.delete()
+    return render(request, 'success.html')
 
 
 class FilmListView(ListView):
